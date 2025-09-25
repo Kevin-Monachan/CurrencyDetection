@@ -15,9 +15,8 @@ if not os.path.exists(UPLOAD_FOLDER):
     os.makedirs(UPLOAD_FOLDER)
 
 # Load your trained model and classes
-MODEL_PATH = 'D:\IndianCurrencyDetectioModel/best_resnext50_indian_currency_model.pth' # Make sure this path is correct
+MODEL_PATH = 'D:\IndianCurrencyDetectioModel/best_resnext50_indian_currency_model.pth' 
 MODEL_NAME = 'resnext50'
-CLASS_NAMES = ['10', '20', '50', '100', '200', '500'] # Must match your training classes
 
 def allowed_file(filename):
     return '.' in filename and \
@@ -39,9 +38,9 @@ def predict():
         filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
         file.save(filepath)
 
-        # Preprocess and get prediction from the model
-        predicted_denomination, confidence = load_model_and_predict(
-            filepath, MODEL_PATH, MODEL_NAME, CLASS_NAMES
+        # Get prediction and the correct class names from model.py
+        predicted_denomination, confidence, class_names = load_model_and_predict(
+            filepath, MODEL_PATH, MODEL_NAME
         )
         
         # Clean up the temporary file
@@ -49,8 +48,10 @@ def predict():
         
         return jsonify({
             'prediction': predicted_denomination,
-            'confidence': f"{confidence:.2f}"
+            'confidence': f"{confidence:.2f}",
+            'class_names': class_names # Now sending the correct names
         })
+    return jsonify({'error': 'Invalid file type'}), 400
 
 if __name__ == '__main__':
     app.run(debug=True)
